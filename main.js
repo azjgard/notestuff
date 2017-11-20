@@ -8,6 +8,8 @@
 //
 // FIXME:
 // Fix mouseup event inconsistencies
+// NOTE: this will also fix the issue with the sidebar not closing
+// properly when all marks are removed.
 
 // FIXME:
 // When highlighting text which has multiple instances in the element
@@ -16,7 +18,29 @@
 
 // FIXME:
 // If the highlight starts in one element and ends in another element
-// (e.g. it spans across two p tags), crap breaks
+// (e.g. it spans across two p tags), crap breaks.
+//
+
+// FIXME:
+// Prevent highlights from occurring on the notes themselves.
+
+// --------------------------------------
+// --------------------------------------
+// --------------------------------------
+// Global variables
+// --------------------------------------
+// --------------------------------------
+// --------------------------------------
+
+let notes = {};
+
+let singleMark = { 
+  "custom-mark-2" : {
+    markText : "sfgjdfg",
+    noteText : "kdgdfg",
+    tags     : ["tag1", "tag2", "tag3"]
+  }
+}
 
 // --------------------------------------
 // --------------------------------------
@@ -74,7 +98,7 @@ $('html').on('mouseup', function(e) {
   const text      = selection.toString();
 
   if (text) {
-    addMark(selection, text);
+    initializeNewMark(selection, text);
   }
 });
 
@@ -94,7 +118,7 @@ $('html').on('mouseup', function(e) {
 // --------------------------------------
 // --------------------------------------
 
-function addMark(selection, text) {
+function initializeNewMark(selection, text) {
   const anchor    = selection.anchorNode.parentElement;
   const className = `custom-mark-${markAddedCount}`;
 
@@ -126,17 +150,16 @@ function addMark(selection, text) {
   // Finding the element with the marked text inside of it
   markElement = $(anchor).find(`.${className}`);
 
-
-  // Add the note element
-
-
+  addMarkData(className, text);
 
   // Binding an event to remove the highlight
   $(markElement).on('click', function(e) {
     if (controlPressed) {
       $(this).unmark();
+
       markCount--;
-      console.log(markCount);
+
+      delete notes[className];
 
       if (markCount === 0) {
        $('body').removeClass('notes-visible');
@@ -147,8 +170,16 @@ function addMark(selection, text) {
   // Incrementing the mark count to ensure that we have
   // unique classNames for each mark
   markCount++;
-  console.log(markCount);
   markAddedCount++;
+}
+
+function addMarkData(markClassName, text) {
+  notes[markClassName] = {
+    markText : text,
+    noteText : "note text goes here",
+    tags     : []
+  };
+
 }
 
 // --------------------------------------

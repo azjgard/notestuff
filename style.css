@@ -1,14 +1,16 @@
 body {
-  width        : 500px;
-  margin       : auto;
-}
+  width              : 500px;
+  margin             : auto;
+  -webkit-transition : padding .5s;
+  -moz-transition    : padding .5s;
+  transition         : padding .5s;
 
+}
 body.notes-visible {
-  padding-right: 300px;
+  padding-right : 300px;
 }
-
 body.notes-visible #notes {
-  transform: translateX(0);
+  transform : translateX(0);
 }
 
 .delete-mark:hover {
@@ -25,8 +27,29 @@ body.notes-visible #notes {
   width    : 300px;
   transform: translateX(300px);
   background-color: #ccc;
+  padding-top: 30px;
 
-  -webkit-transition : all .5s;
-  -moz-transition    : all .5s;
-  transition         : all .5s;
+  -webkit-transition : transform .5s;
+  -moz-transition    : transform .5s;
+  transition         : transform .5s;
 }
+
+.mark {
+  width  : 80%;
+  margin : auto;
+  border : 1px solid #000;
+}
+
+.mark span {
+ border: 1px solid #ccc; 
+ padding: 5px;
+}
+
+.mark textarea {
+ height     : 200px;
+ overflow-y : auto;
+ margin     : auto;
+ width      : 80%;
+ display    : block;
+}
+
