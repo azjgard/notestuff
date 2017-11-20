@@ -1,7 +1,5 @@
 //
 // TODO:
-// - Track the mark text in a separate list
-// - Add in mark-specific notes
 // - Add tags to filter the marks by
 // - Search bar to search through the marks
 
@@ -93,11 +91,16 @@ let markCount      = 0;
 let markAddedCount = 0;
 
 $('html').on('mouseup', function(e) {
-  // Selection Object
   const selection = window.getSelection();
   const text      = selection.toString();
 
-  if (text) {
+  // Don't allow the user to highlight notes that
+  // are in the notes sidebar... no META NOTES
+  const hasNotesAsParent = $(selection.anchorNode)
+                            .closest('#notes')
+                            .length > 0;
+
+  if (text && !hasNotesAsParent) {
     initializeNewMark(selection, text);
   }
 });
@@ -155,14 +158,17 @@ function initializeNewMark(selection, text) {
   // Binding an event to remove the highlight
   $(markElement).on('click', function(e) {
     if (controlPressed) {
+
       $(this).unmark();
 
       markCount--;
 
       delete notes[className];
 
+      $(`#notes .${className}`).remove();
+
       if (markCount === 0) {
-       $('body').removeClass('notes-visible');
+        $('body').removeClass('notes-visible');
       }
     }
   });
@@ -180,6 +186,22 @@ function addMarkData(markClassName, text) {
     tags     : []
   };
 
+  addMarkView(
+    markClassName,
+    notes[markClassName].markText,
+    notes[markClassName].noteText,
+    notes[markClassName].tags
+  );
+}
+
+function addMarkView(markClassName, markText, noteText, tags) {
+  $('#notes').append(`
+      <div class="mark ${markClassName}">
+        <span>${markText}</span>
+        <textarea>${noteText}</textarea>
+        <input type="text" value="${tags}"/>
+      </div>`
+  );
 }
 
 // --------------------------------------
