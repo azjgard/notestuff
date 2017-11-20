@@ -43,7 +43,6 @@ let notes = loadExistingNotes();
 // --------------------------------------
 // --------------------------------------
 
-
 let controlPressed = false;
 const controlKey   = 17;
 
@@ -200,7 +199,7 @@ function addMarkData(markClassName, text) {
 }
 
 function addMarkView(markClassName, markText, noteText, tags) {
-  $('#notes').append(`
+  $('#notes > div').append(`
       <div class="mark ${markClassName}">
         <div class="tags"></div>
         <span>${markText}</span>
@@ -248,6 +247,42 @@ function addTagView(markClassName, text) {
 }
 
 
+$('#search-notes').on('keyup', function() {
+  search($(this).val()); 
+});
+
+function search(text) {
+  const cleanText = text.trim().toLowerCase();
+
+  let matchingNotes = {};
+
+  $('#notes > div').html('');
+
+  for (const key in notes) {
+    const note              = notes[key];
+    const combinedTagString = note.tags.join(' ');
+
+    if (
+      (
+        combinedTagString.toLowerCase().includes(text) ||
+        note.markText.toLowerCase().includes(text) ||
+        note.noteText.toLowerCase().includes(text)
+      ) || (!text)
+    ) {
+      matchingNotes[key] = notes[key];
+
+      addMarkView(
+        key,
+        note.markText,
+        note.noteText,
+        note.tags
+      );
+    }
+  }
+}
+
+
+
 
 // --------------------------------------
 // --------------------------------------
@@ -256,7 +291,7 @@ function addTagView(markClassName, text) {
 // --------------------------------------
 // --------------------------------------
 // --------------------------------------
- 
+
 
 // --------------------------------------
 // --------------------------------------
