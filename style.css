@@ -1,0 +1,32 @@
+body {
+  width        : 500px;
+  margin       : auto;
+}
+
+body.notes-visible {
+  padding-right: 300px;
+}
+
+body.notes-visible #notes {
+  transform: translateX(0);
+}
+
+.delete-mark:hover {
+  cursor           : pointer;
+  background-color : red;
+}
+
+
+#notes {
+  position : absolute;
+  right    : 0;
+  top      : 0;
+  bottom   : 0;
+  width    : 300px;
+  transform: translateX(300px);
+  background-color: #ccc;
+
+  -webkit-transition : all .5s;
+  -moz-transition    : all .5s;
+  transition         : all .5s;
+}
