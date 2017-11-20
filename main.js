@@ -1,6 +1,5 @@
 //
 // TODO:
-// - Add tags to filter the marks by
 // - Search bar to search through the marks
 
 //
@@ -22,6 +21,10 @@
 // FIXME:
 // Prevent highlights from occurring on the notes themselves.
 
+// FIXME:
+// Tag data doesn't update correctly all the time as tags are added
+// and removed from the view layer
+
 // --------------------------------------
 // --------------------------------------
 // --------------------------------------
@@ -30,15 +33,7 @@
 // --------------------------------------
 // --------------------------------------
 
-let notes = {};
-
-let singleMark = { 
-  "custom-mark-2" : {
-    markText : "sfgjdfg",
-    noteText : "kdgdfg",
-    tags     : ["tag1", "tag2", "tag3"]
-  }
-}
+let notes = loadExistingNotes();
 
 // --------------------------------------
 // --------------------------------------
@@ -57,6 +52,7 @@ $(document).on('keydown', function(e) {
 
   if (keyPressed === controlKey) {
     $('mark').addClass('delete-mark');
+    $('.tag').addClass('delete-mark');
     controlPressed = true; 
   }
 });
@@ -66,6 +62,7 @@ $(document).on('keyup', function(e) {
 
   if (keyPressed === controlKey) {
     $('mark').removeClass('delete-mark');
+    $('.tag').removeClass('delete-mark');
     controlPressed = false; 
   }
 });
@@ -120,6 +117,14 @@ $('html').on('mouseup', function(e) {
 // --------------------------------------
 // --------------------------------------
 // --------------------------------------
+
+
+function loadExistingNotes() {
+  // TODO: read from database or read from server 
+
+  return {};
+}
+
 
 function initializeNewMark(selection, text) {
   const anchor    = selection.anchorNode.parentElement;
@@ -182,7 +187,7 @@ function initializeNewMark(selection, text) {
 function addMarkData(markClassName, text) {
   notes[markClassName] = {
     markText : text,
-    noteText : "note text goes here",
+    noteText : "",
     tags     : []
   };
 
@@ -197,17 +202,78 @@ function addMarkData(markClassName, text) {
 function addMarkView(markClassName, markText, noteText, tags) {
   $('#notes').append(`
       <div class="mark ${markClassName}">
+        <div class="tags"></div>
         <span>${markText}</span>
         <textarea>${noteText}</textarea>
         <input type="text" value="${tags}"/>
       </div>`
   );
+
+  $(`.mark.${markClassName} textarea`).on('keyup', function(e) {   
+    // updating the data object
+    notes[markClassName].noteText = $(this).val();
+  });
+
+  $(`.mark.${markClassName} input`).on('keyup', function(e) {   
+    if (e.which === 13 && $(this).val()) {
+      const text = $(this).val();
+      // updating the data object
+      notes[markClassName].tags.push(text);
+      // clearing the input box
+      $(this).val('');
+
+      addTagView(markClassName, text);
+    }
+  });
 }
+
+function addTagView(markClassName, text) {
+  $(`.mark.${markClassName} .tags`).append(`<span class="tag">${text}</span>`);
+
+  const tags             = $(`.mark.${markClassName} .tags`).children();
+  const numOfTags        = tags.length;
+  const latestTagElement = $( $(tags)[tags.length-1] );
+
+  $(latestTagElement).on('click', function(e) {
+    if (controlPressed) {
+      // update view
+      $(this).remove();
+
+      // update data
+      notes[markClassName].tags = notes[markClassName].tags.filter(text => {
+        return text !== $(this).text();
+      });
+    }
+  });
+}
+
+
 
 // --------------------------------------
 // --------------------------------------
 // --------------------------------------
 // Functions
+// --------------------------------------
+// --------------------------------------
+// --------------------------------------
+ 
+
+// --------------------------------------
+// --------------------------------------
+// --------------------------------------
+// Debugging Crap
+// --------------------------------------
+// --------------------------------------
+// --------------------------------------
+
+$('#show-notes').on('click', function() {
+  console.log(notes);
+})
+
+// --------------------------------------
+// --------------------------------------
+// --------------------------------------
+// Debugging Crap
 // --------------------------------------
 // --------------------------------------
 // --------------------------------------
